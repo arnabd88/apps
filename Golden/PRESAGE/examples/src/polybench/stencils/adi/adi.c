@@ -155,7 +155,7 @@ int main(int argc, char** argv)
   printf("Total time taken to execute the kernel: %lf seconds\n", (double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec))/(double)1000000);
   runtime=(double) ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec))/(double)1000000;
 
-  if(argc==4){
+  if(argc>=4){
     print_data_2d(n,n,u,argv[3],1);
     print_data_2d(n,n,v,argv[3],0);
     print_data_2d(n,n,p,argv[3],0);

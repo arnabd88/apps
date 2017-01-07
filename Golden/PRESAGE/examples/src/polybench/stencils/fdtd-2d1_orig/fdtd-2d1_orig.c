@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
 	func(ex,ey,hz);
 
-	if(argc==4)
+	if(argc>=4)
 	{
 		print_data_2d(64,65,ex,argv[3],1);
 		print_data_2d(65,64,ey,argv[3],0);

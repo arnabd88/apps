@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 
 	func(a);
 
-	if(argc==4)
+	if(argc>=4)
 	{
 		print_data_2d(64,64,a,argv[3],1);
 	}

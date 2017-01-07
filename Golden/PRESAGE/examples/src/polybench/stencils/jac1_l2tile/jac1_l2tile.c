@@ -4186,7 +4186,7 @@ int main(int argc, char** argv)
 	func(n, a, b);
 	//gettimeofday(&end, NULL);
 	
-	if(argc==4) {
+	if(argc>=4) {
 		print_data_1d(n,a,argv[3],1);
 		print_data_1d(n,b,argv[3],0);
 	}
