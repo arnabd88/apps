@@ -1,5 +1,5 @@
 CAT_NAME="stencils"
-EX_NAME="lu1"
+EX_NAME="lu2"
 FCP="num"
 #TARGETS=ex_ori_gep
 TARGETS=ex_dti_gep
