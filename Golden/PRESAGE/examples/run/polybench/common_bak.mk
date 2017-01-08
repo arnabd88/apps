@@ -20,7 +20,7 @@ OUT1_ADDR = "result_error_addr.dat"
 CMD2 = "64 64 result_noerror_psg.dat"
 OUT2 = "result_noerror_psg.dat"
 
-CMD2_ADDR = "64 64 result_error_psg.dat runtime_error_psg.dat detect_error_psg.dat"
+CMD2_ADDR = "64 64 result_error_psg.dat"
 OUT2_ADDR = "result_error_psg.dat"
 
 all: $(TARGETS)
@@ -38,7 +38,6 @@ ex_ori_gep:
 	--rslt result_$(EX_NAME)_ori_gep.csv --ficsv fi.csv \
 	--th 0.0
 	rm -f *.in *.out *.dat *.ppm *~
-	#rm -f *.in *.out *.ppm *~
 	
 #ex_ori_idx:
 #	python $(VULFI_SRC_DIR)/scripts/driver.py -e -c --fcp $(FCP) \
@@ -60,14 +59,13 @@ ex_dti_gep:
 	--cmd1 $(CMD1) \
 	--out1 $(OUT1) \
 	--exec2 $(BUILD_DIR)/$(EX_NAME)_dti_gep \
-	--cmd2 $(CMD2_ADDR) \
-	--out2 $(OUT2_ADDR) \
+	--cmd2 $(CMD2) \
+	--out2 $(OUT2) \
 	--iter 10 --pv --ff eql --fc 1 \
 	--fia abr --fbu 63 --fbl 0 \
 	--rslt result_$(EX_NAME)_dti_gep.csv --ficsv fi.csv \
 	--th 0.0
-	#rm -f *.in *.out *.dat *.ppm *~
-	rm -f *.in *.ppm *~
+	rm -f *.in *.out *.dat *.ppm *~
 	
 #ex_dti_idx:
 #	python $(VULFI_SRC_DIR)/scripts/driver.py -e -c --fcp $(FCP) \
