@@ -3,6 +3,9 @@
 ## 2. Submitting the batch jobs
 ## 3. Tracking the submitted jobs to completion
 
+##--- Signature ---------------
+## tclsh BatchSubmit.tcl -p <run_path_upto_stencil> -fl <filelist> -cat <stencil> -n <campaign number>
+
 proc FileToList { source_file } {
 	set orgfile [open $source_file {RDONLY}]
 	set contents [split [read -nonewline $orgfile] \n]
@@ -61,17 +64,6 @@ proc getBenchList { RunDir } {
 
 	}
 }
-
-proc dumpMake { exe bench cat } {
-	set infile [open common_$bench.mk w]
-	puts $infile "CAT_NAME=\"$cat\""
-	puts $infile "EX_NAME=\"$bench\""
-	puts $infile "FCP=\"num\""
-	puts $infile "TARGETS=ex_$exe\_gep"
-	puts $infile "include ../../../common.mk"
-	close $infile
-}
-
 proc dumpAndSubmitBatchScript { exe bench cat } {
 	set infile [open batch.slurm w]
 	puts $infile "\#\!\/bin\/csh"
@@ -93,13 +85,30 @@ proc dumpAndSubmitBatchScript { exe bench cat } {
 	puts $msg
 }
 
-proc generateMake { ori dti bench cat} {
+
+proc dumpMake { bench cat } {
+	set infile [open common_$bench.mk w]
+	puts $infile "CAT_NAME=\"$cat\""
+	puts $infile "EX_NAME=\"$bench\""
+	puts $infile "FCP=\"num\""
+	puts $infile "TARGETS=ex_ori_gep ex_dti_gep"
+	puts $infile "include ../../../common.mk"
+	close $infile
+}
+
+
+proc generateMake { num bench cat } {
 	set cdir [pwd]
-	cd $ori
-	dumpMake $ori $bench $cat
+	cd $num
+	dumpMake $bench $cat
 	cd $cdir
-	cd $dti
-	dumpMake $dti $bench $cat
+}
+
+proc runSim { num bench cat } {
+	set cdir [pwd]
+	cd $num
+	catch {exec make -f common_$bench.mk} msg
+	puts $msg
 	cd $cdir
 }
 
@@ -113,7 +122,7 @@ proc generateBatch { ori dti bench cat } {
 	cd $cdir
 }
 
-proc SetUpAndSubmit { RunDir benchList Cat} {
+proc SetUpAndSubmit { RunDir benchList Cat campNum} {
 	set blen [llength $benchList]
 	if {$blen <= 0} {
 		puts "INFO: ERROR ---- No BenchMark selected for simulations ----"
@@ -126,15 +135,23 @@ proc SetUpAndSubmit { RunDir benchList Cat} {
 		set benchDir "$RunDir/$bench/"
 		puts $bench
 		cd $benchDir
-		if {[file exists "ori"]} {
-			exec rm -rf ori
-		} 
-		if {[file exists "dti"]} {
-			exec rm -rf dti
+		for {set j 0} { $j < $campNum } {incr j} {
+			if {[file exists $j]} {
+				exec rm -rf $j
+			}
+			exec mkdir $j
+			generateMake $j $bench $Cat
+			runSim $j $bench $Cat
 		}
-		exec mkdir ori dti
-		generateMake "ori" "dti" $bench $Cat
-		generateBatch "ori" "dti" $bench $Cat
+		## if {[file exists "ori"]} {
+		## 	exec rm -rf ori
+		## } 
+		## if {[file exists "dti"]} {
+		## 	exec rm -rf dti
+		## }
+		## exec mkdir ori dti
+		## generateMake "ori" "dti" $bench $Cat
+		## generateBatch "ori" "dti" $bench $Cat
 	}
 	cd $homeDir
 	
@@ -150,12 +167,22 @@ proc getCatName { } {
 	}
 }
 
+proc getCampaign { } {
+	if {[lsearch $::argv "-n"] == -1} {
+		Info "Warning" "Number of campaign not specified => Defaulting to 20"
+		return 20
+	} else {
+		return [lindex $::argv [expr {[lsearch $::argv "-n"] + 1}]]
+	}
+}
+
 proc main { } {
 	set homedir [pwd]
 	set RunDir [ getRunDir ]
 	set Cat [ getCatName ]
 	set benchList [ getBenchList $RunDir]
-	SetUpAndSubmit $RunDir $benchList $Cat
+	set campaign [ getCampaign ]
+	SetUpAndSubmit $RunDir $benchList $Cat $campaign
 	#GenBatchScript $RunDir $benchList
 }
 
